@@ -37,6 +37,12 @@ from aqt.utils import showText
 from aqt.qt import *
 from aqt import mw
 from operator import itemgetter
+import time
+import urllib
+try:
+    import urllib2
+except Exception:
+    import urllib.request as urllib2
 
 __window = None
 
@@ -385,11 +391,10 @@ class QuizletWindow(QWidget):
         file_name = "quizlet-" + \
             suffix if suffix else "quizlet-" + url.split('/')[-1]
         # get original, non-mobile version of images
-        r = requests.get(url, stream=True, verify=False, headers=headers)
-        if r.status_code == 200:
+        r = urllib2.urlopen(urllib2.Request(url, headers=headers))
+        if r.getcode() == 200:
             with open(mw.col.media.dir() + "/" + file_name, 'wb') as f:
-                r.raw.decode_content = True
-                shutil.copyfileobj(r.raw, f)
+                f.write(r.read())
         return file_name
 
 
